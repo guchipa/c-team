@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Complete; 
 
 public class CartridgeSpawner : MonoBehaviour
 {
@@ -15,10 +16,51 @@ public class CartridgeSpawner : MonoBehaviour
     [SerializeField]
     private float m_SpawnHeight = 0.5f;      // 生成する高さ
 
+    private GameManager m_GameManager;
+    private Coroutine m_SpawnCoroutine;
     private void Start()
     {
-        // スポーン処理開始
-        StartCoroutine(SpawnRoutine());
+        m_GameManager = FindObjectOfType<GameManager>();
+        
+        if (m_GameManager != null)
+        {
+            // イベントの購読を開始
+            m_GameManager.OnGameStateChanged += HandleGameStateChanged;
+        }
+        else
+        {
+            Debug.LogError("GameManager not found!");
+        }
+    }
+
+    private void HandleGameStateChanged(GameManager.GameState newState)
+    {
+        if (newState == GameManager.GameState.RoundPlaying)
+        {
+            // プレイ中ならスポーン開始
+            if (m_SpawnCoroutine == null)
+            {
+                m_SpawnCoroutine = StartCoroutine(SpawnRoutine());
+            }
+        }
+        else
+        {
+            // それ以外なら停止
+            if (m_SpawnCoroutine != null)
+            {
+                StopCoroutine(m_SpawnCoroutine);
+                m_SpawnCoroutine = null;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // イベントの購読を解除
+        if (m_GameManager != null)
+        {
+            m_GameManager.OnGameStateChanged -= HandleGameStateChanged;
+        }
     }
 
     // カートリッジ生成メソッド
@@ -42,7 +84,7 @@ public class CartridgeSpawner : MonoBehaviour
     // スポーン用コルーチン
     private IEnumerator SpawnRoutine()
     {
-        while (true)  // 無限ループ
+        while (true) 
         {
             SpawnCartridge();  // カートリッジ生成
 
