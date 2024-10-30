@@ -18,8 +18,8 @@ namespace Complete
 
         [Header("Ammo Settings")]
         public int m_InitialAmmoCount = 10;         // ゲーム開始時の砲弾の所持数
-        public int m_MaxAmmoCount = 20;             // 所持可能な砲弾の最大数（課題2-1）
-        public int m_AmmoRefillAmount = 5;          // カートリッジ取得時の補充量（課題2-1）
+        public int m_MaxAmmoCount = 50;             // 所持可能な砲弾の最大数
+        public int m_AmmoRefillAmount = 5;          // カートリッジ取得時の補充量
         private int m_CurrentAmmoCount;            // 現在の砲弾の所持数
 
         private string m_FireButton;                // The input axis that is used for launching shells.
@@ -27,6 +27,8 @@ namespace Complete
         private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
         private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
 
+        public delegate void ShellStockChangedHandler(int currentStock);
+        public event ShellStockChangedHandler OnShellStockChanged;
 
         private void OnEnable()
         {
@@ -34,6 +36,7 @@ namespace Complete
             m_CurrentLaunchForce = m_MinLaunchForce;
             m_AimSlider.value = m_MinLaunchForce;
             m_CurrentAmmoCount = m_InitialAmmoCount;
+            NotifyShellStockChanged();
         }
 
 
@@ -51,7 +54,6 @@ namespace Complete
 
         private void Update ()
         {
-            // 課題1-3：砲弾の数がゼロ以下でないことをチェック
             if (m_CurrentAmmoCount <= 0)
             {
                 return;
@@ -93,6 +95,10 @@ namespace Complete
             }
         }
 
+        private void NotifyShellStockChanged()
+        {
+            OnShellStockChanged?.Invoke(m_CurrentAmmoCount);
+        }
 
         private void Fire ()
         {
@@ -113,15 +119,19 @@ namespace Complete
             // Reset the launch force.  This is a precaution in case of missing button events.
             m_CurrentLaunchForce = m_MinLaunchForce;
             m_CurrentAmmoCount--;
+            NotifyShellStockChanged();
         }
         public void RefillAmmo()
         {
             // 現在の弾薬数に補充量を加えた値と最大値を比較し、
             // 小さい方を新しい弾薬数とする
+            int beforeRefill = m_CurrentAmmoCount;
             m_CurrentAmmoCount = Mathf.Min(
                 m_CurrentAmmoCount + m_AmmoRefillAmount, 
                 m_MaxAmmoCount
             );
+            Debug.Log($"Refill: {beforeRefill} -> {m_CurrentAmmoCount} (Max: {m_MaxAmmoCount})");
+            NotifyShellStockChanged();
         }
         private void OnCollisionEnter(Collision collision)
         {

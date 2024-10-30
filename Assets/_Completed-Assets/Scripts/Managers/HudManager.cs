@@ -19,24 +19,42 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
         {
             if (m_GameManager != null)
             {
-                // イベントの購読を開始
+                // GameManagerのイベント購読
                 m_GameManager.OnGameStateChanged += HandleGameStateChanged;
-            }
-            else
-            {
-                Debug.LogError("GameManager not found!");
-            }
 
-            // 初期状態は非表示
+                // 各タンクのイベント購読
+                foreach (var tank in m_GameManager.m_Tanks)
+                {
+                    tank.OnWeaponStockChanged += HandleWeaponStockChanged;
+                }
+            }
             SetHudVisibility(false);
         }
 
         private void OnDestroy()
         {
-            // イベントの購読を解除
             if (m_GameManager != null)
             {
                 m_GameManager.OnGameStateChanged -= HandleGameStateChanged;
+
+                // イベント購読の解除
+                foreach (var tank in m_GameManager.m_Tanks)
+                {
+                    tank.OnWeaponStockChanged -= HandleWeaponStockChanged;
+                }
+            }
+        }
+
+        private void HandleWeaponStockChanged(int playerNumber, int currentStock)
+        {
+            // プレイヤー番号に応じて対応するUIを更新
+            if (playerNumber == 1 && m_Player1StockArea != null)
+            {
+                m_Player1StockArea.UpdatePlayerStockArea(currentStock);
+            }
+            else if (playerNumber == 2 && m_Player2StockArea != null)
+            {
+                m_Player2StockArea.UpdatePlayerStockArea(currentStock);
             }
         }
 
