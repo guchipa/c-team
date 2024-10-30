@@ -123,5 +123,17 @@ namespace Complete
                 m_MaxAmmoCount
             );
         }
+        private void OnCollisionEnter(Collision collision)
+        {
+            // 衝突したオブジェクトのタグがShellCartridgeかチェック
+            if (collision.gameObject.CompareTag("ShellCartridge"))
+            {
+                // 弾薬を補充
+                RefillAmmo();
+                
+                // カートリッジを破壊
+                Destroy(collision.gameObject);
+            }
+        }
     }
 }
