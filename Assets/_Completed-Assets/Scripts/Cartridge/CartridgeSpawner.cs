@@ -16,11 +16,11 @@ public class CartridgeSpawner : MonoBehaviour
     [SerializeField]
     private float m_SpawnHeight = 0.5f;      // 生成する高さ
 
-    private GameManager m_GameManager;
+    private Complete.GameManager m_GameManager;
     private Coroutine m_SpawnCoroutine;
     private void Start()
     {
-        m_GameManager = FindObjectOfType<GameManager>();
+        m_GameManager = FindObjectOfType<Complete.GameManager>();
         
         if (m_GameManager != null)
         {
@@ -33,9 +33,9 @@ public class CartridgeSpawner : MonoBehaviour
         }
     }
 
-    private void HandleGameStateChanged(GameManager.GameState newState)
+    private void HandleGameStateChanged(Complete.GameManager.GameState newState)
     {
-        if (newState == GameManager.GameState.RoundPlaying)
+        if (newState == Complete.GameManager.GameState.RoundPlaying)
         {
             // プレイ中ならスポーン開始
             if (m_SpawnCoroutine == null)
