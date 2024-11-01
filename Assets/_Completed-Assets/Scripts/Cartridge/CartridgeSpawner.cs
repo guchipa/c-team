@@ -12,7 +12,7 @@ namespace Complete
         private float m_SpawnInterval = 10f;     // 生成間隔（秒）
 
         [SerializeField]
-        private float m_SpawnRadius = 20f;       // 生成範囲の半径
+        private float m_AreaSize = 100f;          // エリアのサイズ（100x100）
 
         [SerializeField]
         private float m_SpawnHeight = 0.5f;      // 生成する高さ
@@ -68,13 +68,10 @@ namespace Complete
         // カートリッジ生成メソッド
         private void SpawnCartridge()
         {
-            // ランダムな位置を計算
-            float randomAngle = Random.Range(0f, 360f);
-            float randomRadius = Random.Range(0f, m_SpawnRadius);
-            
-            // 円形の範囲内でランダムな位置を決定
-            float xPos = randomRadius * Mathf.Cos(randomAngle * Mathf.Deg2Rad);
-            float zPos = randomRadius * Mathf.Sin(randomAngle * Mathf.Deg2Rad);
+            // 正方形エリア内でランダムな位置を計算
+            float halfSize = m_AreaSize * 0.5f;
+            float xPos = Random.Range(-halfSize, halfSize);
+            float zPos = Random.Range(-halfSize, halfSize);
             
             // 生成位置を設定
             Vector3 spawnPosition = new Vector3(xPos, m_SpawnHeight, zPos);
@@ -98,8 +95,20 @@ namespace Complete
         // デバッグ用：生成範囲の可視化
         private void OnDrawGizmosSelected()
         {
+            // 正方形の範囲を表示
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, m_SpawnRadius);
+            float halfSize = m_AreaSize * 0.5f;
+            Vector3 center = transform.position;
+            
+            Vector3 p1 = center + new Vector3(-halfSize, 0, -halfSize);
+            Vector3 p2 = center + new Vector3(-halfSize, 0, halfSize);
+            Vector3 p3 = center + new Vector3(halfSize, 0, halfSize);
+            Vector3 p4 = center + new Vector3(halfSize, 0, -halfSize);
+            
+            Gizmos.DrawLine(p1, p2);
+            Gizmos.DrawLine(p2, p3);
+            Gizmos.DrawLine(p3, p4);
+            Gizmos.DrawLine(p4, p1);
         }
     }
 }
