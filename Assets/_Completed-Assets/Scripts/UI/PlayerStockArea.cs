@@ -11,8 +11,6 @@ public class PlayerStockArea : MonoBehaviour
 
     private void Start()
     {
-        // 初期状態では全て非表示
-        UpdatePlayerStockArea(0);
     }
 
     public void UpdatePlayerStockArea(int stockCount)
