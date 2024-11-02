@@ -15,6 +15,7 @@ namespace Complete
         public float m_MinLaunchForce = 15f;        // The force given to the shell if the fire button is not held.
         public float m_MaxLaunchForce = 30f;        // The force given to the shell if the fire button is held for the max charge time.
         public float m_MaxChargeTime = 0.75f;       // How long the shell can charge for before it is fired at max force.
+        private bool m_IsGaugeIncreasing = true;    // ゲージが増加中かどうか
 
         [Header("Ammo Settings")]
         public int m_InitialAmmoCount = 10;         // ゲーム開始時の砲弾の所持数
@@ -61,30 +62,48 @@ namespace Complete
             // The slider should have a default value of the minimum launch force.
             m_AimSlider.value = m_MinLaunchForce;
 
-            // If the max force has been exceeded and the shell hasn't yet been launched...
-            if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
-            {
-                // ... use the max force and launch the shell.
-                m_CurrentLaunchForce = m_MaxLaunchForce;
-                Fire ();
-            }
             // Otherwise, if the fire button has just started being pressed...
-            else if (Input.GetButtonDown (m_FireButton))
+            if (Input.GetButtonDown (m_FireButton))
             {
                 // ... reset the fired flag and reset the launch force.
                 m_Fired = false;
                 m_CurrentLaunchForce = m_MinLaunchForce;
+                m_IsGaugeIncreasing = true;
 
                 // Change the clip to the charging clip and start it playing.
                 m_ShootingAudio.clip = m_ChargingClip;
                 m_ShootingAudio.Play ();
             }
-            // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
-            else if (Input.GetButton (m_FireButton) && !m_Fired)
+            // 発射ボタンが押されている間、かつ未発射の場合
+            else if (Input.GetButton(m_FireButton) && !m_Fired)
             {
-                // Increment the launch force and update the slider.
-                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+                // ゲージが増加中の場合
+                if (m_IsGaugeIncreasing)
+                {
+                    // 発射力を増加
+                    m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+                    
+                    // 最大値に達したらフラグを切り替え
+                    if (m_CurrentLaunchForce >= m_MaxLaunchForce)
+                    {
+                        m_CurrentLaunchForce = m_MaxLaunchForce;
+                        m_IsGaugeIncreasing = false;
+                    }
+                }
+                else  // ゲージが減少中の場合
+                {
+                    // 発射力を減少
+                    m_CurrentLaunchForce -= m_ChargeSpeed * Time.deltaTime;
+                    
+                    // 最小値に達したらフラグを切り替え
+                    if (m_CurrentLaunchForce <= m_MinLaunchForce)
+                    {
+                        m_CurrentLaunchForce = m_MinLaunchForce;
+                        m_IsGaugeIncreasing = true;
+                    }
+                }
 
+                // スライダーの値を更新
                 m_AimSlider.value = m_CurrentLaunchForce;
             }
             // Otherwise, if the fire button is released and the shell hasn't been launched yet...
