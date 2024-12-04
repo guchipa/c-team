@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 namespace Complete 
@@ -6,16 +6,10 @@ namespace Complete
     public class CartridgeSpawner : MonoBehaviour
     {
         [SerializeField]
-        private GameObject m_CartridgePrefab;    // ShellCartridgeプレハブ
-
+        private CartridgeData m_ShellCartridgeData;   // 砲弾カートリッジデータ
+        
         [SerializeField]
-        private float m_SpawnInterval = 10f;     // 生成間隔（秒）
-
-        [SerializeField]
-        private float m_AreaSize = 100f;          // エリアのサイズ（100x100）
-
-        [SerializeField]
-        private float m_SpawnHeight = 0.5f;      // 生成する高さ
+        private CartridgeData m_MineCartridgeData;   // 地雷カートリッジデータ
 
         private GameManager m_GameManager;
         private Coroutine m_SpawnCoroutine;
@@ -37,12 +31,16 @@ namespace Complete
 
         private void HandleGameStateChanged(GameManager.GameState newState)
         {
+            CartridgeData shellCartridgeData = m_ShellCartridgeData;
+            CartridgeData mineCartridgeData = m_MineCartridgeData;
+
             if (newState == GameManager.GameState.RoundPlaying)
             {
                 // プレイ中ならスポーン開始
                 if (m_SpawnCoroutine == null)
                 {
-                    m_SpawnCoroutine = StartCoroutine(SpawnRoutine());
+                    m_SpawnCoroutine = StartCoroutine(SpawnRoutine(shellCartridgeData));
+                    m_SpawnCoroutine = StartCoroutine(SpawnRoutine(mineCartridgeData));
                 }
             }
             else
@@ -66,29 +64,29 @@ namespace Complete
         }
 
         // カートリッジ生成メソッド
-        private void SpawnCartridge()
+        private void SpawnCartridge(CartridgeData data)
         {
             // 正方形エリア内でランダムな位置を計算
-            float halfSize = m_AreaSize * 0.5f;
+            float halfSize = data.m_CartridgeSpawnArea * 0.5f;
             float xPos = Random.Range(-halfSize, halfSize);
             float zPos = Random.Range(-halfSize, halfSize);
             
             // 生成位置を設定
-            Vector3 spawnPosition = new Vector3(xPos, m_SpawnHeight, zPos);
+            Vector3 spawnPosition = new Vector3(xPos, data.m_SpawnHeight, zPos);
 
             // カートリッジを生成
-            Instantiate(m_CartridgePrefab, spawnPosition, Quaternion.identity);
+            Instantiate(data.m_CartridgePrefab, spawnPosition, Quaternion.identity);
         }
 
         // スポーン用コルーチン
-        private IEnumerator SpawnRoutine()
+        private IEnumerator SpawnRoutine(CartridgeData data)
         {
             while (true) 
             {
-                SpawnCartridge();  // カートリッジ生成
+                SpawnCartridge(data);  // カートリッジ生成
 
                 // 次の生成まで待機
-                yield return new WaitForSeconds(m_SpawnInterval);
+                yield return new WaitForSeconds(data.m_CartridgeSpawnInterval);
             }
         }
 
@@ -97,7 +95,7 @@ namespace Complete
         {
             // 正方形の範囲を表示
             Gizmos.color = Color.yellow;
-            float halfSize = m_AreaSize * 0.5f;
+            float halfSize = 100f * 0.5f;
             Vector3 center = transform.position;
             
             Vector3 p1 = center + new Vector3(-halfSize, 0, -halfSize);

@@ -3,7 +3,9 @@ guid: d770f9fcc5d75474d96bf305ed829c1b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_CartridgePrefab: {fileID: 8021954871758145848, guid: bc7050de2b1f748828a788b071a22e88,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
