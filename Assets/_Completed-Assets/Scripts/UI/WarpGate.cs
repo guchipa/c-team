@@ -52,10 +52,6 @@ public class WarpGate : MonoBehaviour
             tankRigidbody.angularVelocity = Vector3.zero; // 回転速度をリセット
         }
 
-         // ワープ中のエフェクト
-        Renderer tankRenderer = tank.GetComponent<Renderer>();
-        if (tankRenderer != null) tankRenderer.enabled = false; // 一時的に非表示
-
         // ワープにかかる時間待機
         yield return new WaitForSeconds(warpDelay);
 
@@ -69,6 +65,8 @@ public class WarpGate : MonoBehaviour
         }
         tank.transform.position = targetPosition;
 
+        // 無敵状態を開始
+        tank.StartInvincibility();
         // ワープ先のゲートを一時的に無効化
         if (linkedGate != null)
         {
@@ -76,7 +74,6 @@ public class WarpGate : MonoBehaviour
         }
 
         // ワープ完了
-        if (tankRenderer != null)tankRenderer.enabled = true; // 表示を復元
         if (tankCollider != null) tankCollider.enabled = true; // コライダーを再度有効化
         tank.EnableCombat(); // 戦闘再開
         tank.IsWarping = false;

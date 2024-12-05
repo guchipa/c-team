@@ -82,7 +82,12 @@ namespace Complete
 
 
         private void Fire ()
-        {
+        { 
+            if (GetComponent<TankController>().IsInvincible) 
+            {
+                Debug.Log("無敵中のため砲撃できません");
+                return;
+            }   
             // Set the fired flag so only Fire is only called once.
             m_Fired = true;
 
