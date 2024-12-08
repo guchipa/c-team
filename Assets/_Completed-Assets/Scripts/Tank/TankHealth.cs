@@ -17,10 +17,10 @@ namespace Complete
         private ParticleSystem m_ExplosionParticles;        // The particle system the will play when the tank is destroyed.
         private float m_CurrentHealth;                      // How much health the tank currently has.
         private bool m_Dead;                                // Has the tank been reduced beyond zero health yet?
-
+        private TankController tankController;
 
         private void Awake ()
-        {
+        {   tankController = GetComponent<TankController>();
             // Instantiate the explosion prefab and get a reference to the particle system on it.
             m_ExplosionParticles = Instantiate (m_ExplosionPrefab).GetComponent<ParticleSystem> ();
 
@@ -44,7 +44,11 @@ namespace Complete
 
 
         public void TakeDamage (float amount)
-        {
+        {   // 無敵状態の場合、ダメージ処理をスキップ
+            if (tankController != null && tankController.IsInvincible)
+            {
+                return;
+            }
             // Reduce current health by the amount of damage done.
             m_CurrentHealth -= amount;
 

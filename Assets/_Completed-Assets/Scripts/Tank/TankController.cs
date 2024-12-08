@@ -7,6 +7,12 @@ public class TankController : MonoBehaviour
     private Collider tankCollider;
     public float invincibilityDuration = 2.0f; // 無敵状態の継続時間
     private bool isInvincible = false;
+
+    public bool IsInvincible // 無敵状態を外部から確認するためのプロパティ
+    {
+        get { return isInvincible; }
+    }
+    
     private void Start()
     {
         tankCollider = GetComponent<Collider>();
