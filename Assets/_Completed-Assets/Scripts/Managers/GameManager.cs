@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,6 +7,16 @@ namespace Complete
 {
     public class GameManager : MonoBehaviour
     {
+        public enum GameState
+        {
+            RoundStarting,    // ゲームの開始処理中
+            RoundPlaying,     // ゲームのプレイ中
+            RoundEnding      // ゲームの終了処理中
+        }
+
+        private GameState m_CurrentGameState;
+        public delegate void GameStateChangedHandler(GameState newState);
+        public event GameStateChangedHandler OnGameStateChanged;
         public int m_NumRoundsToWin = 5;            // The number of rounds a single player has to win to win the game.
         public float m_StartDelay = 3f;             // The delay between the start of RoundStarting and RoundPlaying phases.
         public float m_EndDelay = 3f;               // The delay between the end of RoundPlaying and RoundEnding phases.
@@ -22,6 +32,18 @@ namespace Complete
         private TankManager m_RoundWinner;          // Reference to the winner of the current round.  Used to make an announcement of who won.
         private TankManager m_GameWinner;           // Reference to the winner of the game.  Used to make an announcement of who won.
 
+        private void SetGameState(GameState newState)
+        {
+            // 状態が同じなら更新しない
+            if (m_CurrentGameState == newState)
+                return;
+
+            // 状態を更新
+            m_CurrentGameState = newState;
+
+            // イベント通知
+            OnGameStateChanged?.Invoke(m_CurrentGameState);
+        }
 
         private void Start()
         {
@@ -84,7 +106,7 @@ namespace Complete
             if (m_GameWinner != null)
             {
                 // If there is a game winner, restart the level.
-                SceneManager.LoadScene (0);
+                SceneManager.LoadScene (SceneNames.TITLE);
             }
             else
             {
@@ -97,6 +119,7 @@ namespace Complete
 
         private IEnumerator RoundStarting ()
         {
+            SetGameState(GameState.RoundStarting);
             // As soon as the round starts reset the tanks and make sure they can't move.
             ResetAllTanks ();
             DisableTankControl ();
@@ -115,6 +138,7 @@ namespace Complete
 
         private IEnumerator RoundPlaying ()
         {
+            SetGameState(GameState.RoundPlaying);
             // As soon as the round begins playing let the players control the tanks.
             EnableTankControl ();
 
@@ -132,6 +156,7 @@ namespace Complete
 
         private IEnumerator RoundEnding ()
         {
+            SetGameState(GameState.RoundEnding);
             // Stop tanks from moving.
             DisableTankControl ();
 

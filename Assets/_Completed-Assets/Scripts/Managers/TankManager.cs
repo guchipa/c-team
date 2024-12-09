@@ -23,6 +23,8 @@ namespace Complete
         private TankShooting m_Shooting;                        // Reference to tank's shooting script, used to disable and enable control.
         private GameObject m_CanvasGameObject;                  // Used to disable the world space UI during the Starting and Ending phases of each round.
 
+        public delegate void WeaponStockChangedHandler(int playerNumber, int currentStock);
+        public event WeaponStockChangedHandler OnWeaponStockChanged;
 
         public void Setup ()
         {
@@ -30,6 +32,11 @@ namespace Complete
             m_Movement = m_Instance.GetComponent<TankMovement> ();
             m_Shooting = m_Instance.GetComponent<TankShooting> ();
             m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas> ().gameObject;
+
+            if (m_Shooting != null)
+            {
+                m_Shooting.OnShellStockChanged += HandleShellStockChanged;
+            }
 
             // Set the player numbers to be consistent across the scripts.
             m_Movement.m_PlayerNumber = m_PlayerNumber;
@@ -78,6 +85,19 @@ namespace Complete
 
             m_Instance.SetActive (false);
             m_Instance.SetActive (true);
+        }
+        private void HandleShellStockChanged(int currentStock)
+        {
+            OnWeaponStockChanged?.Invoke(m_PlayerNumber, currentStock);
+        }
+
+        // クリーンアップ
+        public void OnDestroy()
+        {
+            if (m_Shooting != null)
+            {
+                m_Shooting.OnShellStockChanged -= HandleShellStockChanged;
+            }
         }
     }
 }
