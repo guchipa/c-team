@@ -35,16 +35,16 @@ public class TankController : MonoBehaviour
     {  
         if (!isInvincible)
         {
-        isInvincible = true;
-        StartCoroutine(InvincibilityCoroutine());
+            isInvincible = true;   
+            StartCoroutine(InvincibilityCoroutine());
         }
     }
 
     private IEnumerator InvincibilityCoroutine()
     {
         float elapsedTime = 0f;
-        Renderer tankRenderer = GetComponentInChildren<Renderer>();
-        if (tankRenderer == null)
+        Renderer[] tankRenderers = GetComponentsInChildren<Renderer>();
+        if (tankRenderers == null)
         {
             Debug.LogError("Tank Renderer not found! Ensure the tank model has a Renderer component.");
             yield break;
@@ -53,13 +53,17 @@ public class TankController : MonoBehaviour
         while (elapsedTime < invincibilityDuration)
         {
             // 点滅エフェクト
-            tankRenderer.enabled = !tankRenderer.enabled;
+            foreach (Renderer tankRenderer in tankRenderers)
+            {
+                tankRenderer.enabled = !tankRenderer.enabled;
+            }
             yield return new WaitForSeconds(0.1f); // 点滅間隔
             elapsedTime += 0.1f;
         }
 
         // 無敵状態終了
         isInvincible = false;
-        tankRenderer.enabled = true;
+        foreach (Renderer tankRenderer in tankRenderers)
+            tankRenderer.enabled = true;
     }
 }
