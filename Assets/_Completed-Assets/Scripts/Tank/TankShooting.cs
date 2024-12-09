@@ -27,9 +27,15 @@ namespace Complete
         private float m_CurrentLaunchForce;         // The force that will be given to the shell when the fire button is released.
         private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
         private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
+        private TankController tankController;
 
         public delegate void ShellStockChangedHandler(int currentStock);
         public event ShellStockChangedHandler OnShellStockChanged;
+
+        private void Awake()
+        {
+            tankController = GetComponent<TankController>();
+        }
 
         private void OnEnable()
         {
@@ -65,6 +71,13 @@ namespace Complete
             // Otherwise, if the fire button has just started being pressed...
             if (Input.GetButtonDown (m_FireButton))
             {
+                // 無敵状態中は砲撃を無効化
+                if (tankController != null && tankController.IsInvincible)
+                {
+                    Debug.Log("無敵中のため砲撃できません");
+                    return;
+                }
+
                 // ... reset the fired flag and reset the launch force.
                 m_Fired = false;
                 m_CurrentLaunchForce = m_MinLaunchForce;
@@ -120,7 +133,7 @@ namespace Complete
         }
 
         private void Fire ()
-        {
+        { 
             // Set the fired flag so only Fire is only called once.
             m_Fired = true;
 
