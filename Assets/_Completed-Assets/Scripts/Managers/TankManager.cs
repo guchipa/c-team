@@ -29,7 +29,7 @@ namespace Complete
         public delegate void WeaponStockChangedHandler(int playerNumber, int currentStock, string weaponName);
         public event WeaponStockChangedHandler OnWeaponStockChanged;
 
-        private IEnumerator m_LayMineCoroutine = null;
+        public float DisableTime = 3.0f;
 
         public void Setup()
         {
@@ -114,7 +114,7 @@ namespace Complete
             DisableControl();
             Debug.Log("行動不能");
 
-            await DelayedAction.Delay(1.0f, () =>
+            await DelayedAction.Delay(DisableTime, () =>
             {
                 Debug.Log("行動再開");
                 EnableControl();
