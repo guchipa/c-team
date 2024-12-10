@@ -32,6 +32,7 @@ namespace Complete
         private TankManager m_RoundWinner;          // Reference to the winner of the current round.  Used to make an announcement of who won.
         private TankManager m_GameWinner;           // Reference to the winner of the game.  Used to make an announcement of who won.
 
+
         private void SetGameState(GameState newState)
         {
             // 状態が同じなら更新しない
@@ -71,6 +72,7 @@ namespace Complete
                 m_Tanks[i].Setup();
             }
         }
+
 
 
         private void SetCameraTargets()

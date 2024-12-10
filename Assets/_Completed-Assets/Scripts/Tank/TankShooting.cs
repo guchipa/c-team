@@ -27,10 +27,21 @@ namespace Complete
         private float m_CurrentLaunchForce;         // The force that will be given to the shell when the fire button is released.
         private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
         private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
+
+        [Header("Mine Settings")]
+        public WeaponStockData MineData;             // 砲弾の所持数を管理するスクリプタブルオブジェクト
+        private string m_LayMineButton;             // 地雷を設置するボタン
+
         private TankController tankController;
 
         public delegate void ShellStockChangedHandler(int currentStock);
         public event ShellStockChangedHandler OnShellStockChanged;
+
+        public delegate void MineStockChangedHandler(int currentStock);
+        public event MineStockChangedHandler OnMineStockChanged;
+
+        public delegate void LayMineHandler();
+        public event LayMineHandler OnLayMine;
 
         private void Awake()
         {
@@ -51,6 +62,8 @@ namespace Complete
         {
             // The fire axis is based on the player number.
             m_FireButton = "Fire" + m_PlayerNumber;
+            m_LayMineButton = "LayMine" + m_PlayerNumber;
+
 
             // The rate that the launch force charges up is the range of possible forces by the max charge time.
             m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
@@ -61,10 +74,6 @@ namespace Complete
 
         private void Update ()
         {
-            if (m_CurrentAmmoCount <= 0)
-            {
-                return;
-            }
             // The slider should have a default value of the minimum launch force.
             m_AimSlider.value = m_MinLaunchForce;
 
@@ -75,6 +84,12 @@ namespace Complete
                 if (tankController != null && tankController.IsInvincible)
                 {
                     Debug.Log("無敵中のため砲撃できません");
+                    return;
+                }
+
+                if (m_CurrentAmmoCount <= 0)
+                {
+                    Debug.Log("弾薬がありません");
                     return;
                 }
 
@@ -125,6 +140,25 @@ namespace Complete
                 // ... launch the shell.
                 Fire ();
             }
+
+            // 地雷を設置
+            if (Input.GetButtonDown(m_LayMineButton))
+            {
+                // 無敵状態中は地雷設置を無効化
+                if (tankController != null && tankController.IsInvincible)
+                {
+                    Debug.Log("無敵中のため地雷を設置できません");
+                    return;
+                }
+
+                if (MineData.CurrentAmmoCount <= 0)
+                {
+                    Debug.Log("弾薬がありません");
+                    return;
+                }
+
+                LayMine();
+            }
         }
 
         private void NotifyShellStockChanged()
@@ -153,6 +187,21 @@ namespace Complete
             m_CurrentAmmoCount--;
             NotifyShellStockChanged();
         }
+
+        private void NotifyMineStockChanged()
+        {
+            OnMineStockChanged?.Invoke(MineData.CurrentAmmoCount);
+        }
+
+        private void LayMine()
+        {
+            // 地雷を設置
+            GameObject mineInstance = Instantiate(MineData.weaponPrefab, m_FireTransform.position, m_FireTransform.rotation) as GameObject;
+            MineData.UseAmmo();
+            NotifyMineStockChanged();
+            OnLayMine?.Invoke();
+        }
+
         public void RefillAmmo()
         {
             // 現在の弾薬数に補充量を加えた値と最大値を比較し、
@@ -165,6 +214,7 @@ namespace Complete
             Debug.Log($"Refill: {beforeRefill} -> {m_CurrentAmmoCount} (Max: {m_MaxAmmoCount})");
             NotifyShellStockChanged();
         }
+
         private void OnCollisionEnter(Collision collision)
         {
             // 衝突したオブジェクトのタグがShellCartridgeかチェック
@@ -173,6 +223,18 @@ namespace Complete
                 // 弾薬を補充
                 RefillAmmo();
                 
+                // カートリッジを破壊
+                Destroy(collision.gameObject);
+            }
+
+            // 衝突したオブジェクトのタグがMineCartridgeかチェック
+            if (collision.gameObject.CompareTag("MineCartridge"))
+            {
+                // 地雷を補充
+                MineData.AddAmmo();
+                Debug.Log("現在の所持地雷数：" + MineData.CurrentAmmoCount);
+                NotifyMineStockChanged();
+
                 // カートリッジを破壊
                 Destroy(collision.gameObject);
             }

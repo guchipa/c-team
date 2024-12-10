@@ -5,9 +5,10 @@ using UnityEngine;
 [System.Serializable]
 public class WeaponStockData
 {
-    [SerializeField] private int initialAmmoCount;
-    [SerializeField] private int maxAmmoCount;
-    [SerializeField] private int addAmmoCount;
+    public GameObject weaponPrefab;
+    public int initialAmmoCount;
+    public int maxAmmoCount;
+    public int addAmmoCount;
 
     private int currentAmmoCount;
 
