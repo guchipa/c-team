@@ -196,7 +196,16 @@ namespace Complete
         private void LayMine()
         {
             // 地雷を設置
-            GameObject mineInstance = Instantiate(MineData.weaponPrefab, m_FireTransform.position, m_FireTransform.rotation) as GameObject;
+            // 地雷の座標を少し下にずらす
+            m_FireTransform.position = new Vector3(
+                m_FireTransform.position.x,
+                m_FireTransform.position.y - 0.5f,
+                m_FireTransform.position.z
+            );
+
+            GameObject mineInstance = 
+                Instantiate(MineData.weaponPrefab, m_FireTransform.position, m_FireTransform.rotation);
+
             MineData.UseAmmo();
             NotifyMineStockChanged();
             OnLayMine?.Invoke();
