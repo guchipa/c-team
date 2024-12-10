@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using UnityEditor;
+using System.Threading.Tasks;
 
 namespace Complete
 {
@@ -28,7 +30,6 @@ namespace Complete
         public event WeaponStockChangedHandler OnWeaponStockChanged;
 
         private IEnumerator m_LayMineCoroutine = null;
-        public WaitForSeconds LayMineDelay = new WaitForSeconds(1.0f);
 
         public void Setup()
         {
@@ -105,16 +106,19 @@ namespace Complete
 
         private void HandleLayMine()
         {
-            m_LayMineCoroutine = LayMineCoroutine();
-            m_LayMineCoroutine.MoveNext();
+            ExecuteDelayedAction();
         }
 
-        private IEnumerator LayMineCoroutine ()
+        private async void ExecuteDelayedAction()
         {
             DisableControl();
-            yield return new WaitForSeconds(1.0f);
-            EnableControl();
-            m_LayMineCoroutine = null;
+            Debug.Log("行動不能");
+
+            await DelayedAction.Delay(1.0f, () =>
+            {
+                Debug.Log("行動再開");
+                EnableControl();
+            });
         }
 
         // クリーンアップ
@@ -125,5 +129,15 @@ namespace Complete
                 m_Shooting.OnShellStockChanged -= HandleShellStockChanged;
             }
         }
+
+        public static class DelayedAction
+        {
+            public static async Task Delay(float seconds, Action action)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(seconds));
+                action?.Invoke();
+            }
+        }
     }
+
 }
