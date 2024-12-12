@@ -55,6 +55,9 @@ namespace Complete
             m_AimSlider.value = m_MinLaunchForce;
             m_CurrentAmmoCount = m_InitialAmmoCount;
             NotifyShellStockChanged();
+
+            MineData.Initialize();
+            NotifyMineStockChanged();
         }
 
 

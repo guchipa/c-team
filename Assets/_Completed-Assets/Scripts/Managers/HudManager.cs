@@ -49,21 +49,13 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
         {
             // プレイヤー番号に応じて対応するUIを更新
             // 砲弾のUIを更新
-            if (weaponName == WeaponNames.shell)
+            if (playerNumber == 1 && m_Player1StockArea != null)
             {
-                if (playerNumber == 1 && m_Player1StockArea != null)
-                {
-                    m_Player1StockArea.UpdatePlayerStockArea(currentStock);
-                }
-                else if (playerNumber == 2 && m_Player2StockArea != null)
-                {
-                    m_Player2StockArea.UpdatePlayerStockArea(currentStock);
-                }
+                m_Player1StockArea.UpdatePlayerStockArea(currentStock, weaponName);
             }
-
-            if (weaponName == WeaponNames.mine)
+            else if (playerNumber == 2 && m_Player2StockArea != null)
             {
-
+                m_Player2StockArea.UpdatePlayerStockArea(currentStock, weaponName);
             }
         }
 
