@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Complete;  // Complete名前空間を使用
 
 namespace Complete  // HudManagerも同じ名前空間に入れる
@@ -45,16 +45,17 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             }
         }
 
-        private void HandleWeaponStockChanged(int playerNumber, int currentStock)
+        private void HandleWeaponStockChanged(int playerNumber, int currentStock, string weaponName)
         {
             // プレイヤー番号に応じて対応するUIを更新
+            // 砲弾のUIを更新
             if (playerNumber == 1 && m_Player1StockArea != null)
             {
-                m_Player1StockArea.UpdatePlayerStockArea(currentStock);
+                m_Player1StockArea.UpdatePlayerStockArea(currentStock, weaponName);
             }
             else if (playerNumber == 2 && m_Player2StockArea != null)
             {
-                m_Player2StockArea.UpdatePlayerStockArea(currentStock);
+                m_Player2StockArea.UpdatePlayerStockArea(currentStock, weaponName);
             }
         }
 
