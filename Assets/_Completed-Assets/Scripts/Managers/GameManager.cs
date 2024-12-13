@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using Completed;
 namespace Complete
 {
     public class GameManager : MonoBehaviour
@@ -21,6 +21,7 @@ namespace Complete
         public float m_StartDelay = 3f;             // The delay between the start of RoundStarting and RoundPlaying phases.
         public float m_EndDelay = 3f;               // The delay between the end of RoundPlaying and RoundEnding phases.
         public CameraControl m_CameraControl;       // Reference to the CameraControl script for control during different phases.
+        public TpsCameraControl m_TpsCameraControl;
         public Text m_MessageText;                  // Reference to the overlay Text to display winning text, etc.
         public GameObject m_TankPrefab;             // Reference to the prefab the players will control.
         public TankManager[] m_Tanks;               // A collection of managers for enabling and disabling different aspects of the tanks.
@@ -77,18 +78,12 @@ namespace Complete
 
         private void SetCameraTargets()
         {
-            // Create a collection of transforms the same size as the number of tanks.
-            Transform[] targets = new Transform[m_Tanks.Length];
-
-            // For each of these transforms...
-            for (int i = 0; i < targets.Length; i++)
+            if (m_TpsCameraControl != null && m_Tanks.Length > 0)
             {
-                // ... set it to the appropriate tank transform.
-                targets[i] = m_Tanks[i].m_Instance.transform;
+                Debug.Log("aaaaaa");
+                // 最初のタンクの砲塔の Transform を TpsCameraControl に設定
+                m_TpsCameraControl.targetTank = m_Tanks[0].m_Instance.transform.GetChild(0);
             }
-
-            // These are the targets the camera should follow.
-            m_CameraControl.m_Targets = targets;
         }
 
 
@@ -127,7 +122,7 @@ namespace Complete
             DisableTankControl ();
 
             // Snap the camera's zoom and position to something appropriate for the reset tanks.
-            m_CameraControl.SetStartPositionAndSize ();
+            //m_CameraControl.SetStartPositionAndSize ();
 
             // Increment the round number and display text showing the players what round it is.
             m_RoundNumber++;
