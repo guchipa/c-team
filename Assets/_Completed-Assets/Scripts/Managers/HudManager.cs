@@ -62,8 +62,12 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
         private void HandleGameStateChanged(GameManager.GameState newState)
         {
             // プレイ中のみHUDを表示
-            bool shouldShow = (newState == GameManager.GameState.RoundPlaying);
-            SetHudVisibility(shouldShow);
+            bool shouldShowHUD = (newState == GameManager.GameState.RoundPlaying);
+            SetHudVisibility(shouldShowHUD);
+
+            // ミニマップの表示/非表示を設定
+            bool shouldShowMinimap = (newState == GameManager.GameState.RoundPlaying);
+            SetMinimapVisibility(shouldShowMinimap);
         }
 
         private void SetHudVisibility(bool visible)
