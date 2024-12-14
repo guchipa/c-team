@@ -24,10 +24,14 @@ namespace Complete
 
         private TankMovement m_Movement;                        // Reference to tank's movement script, used to disable and enable control.
         private TankShooting m_Shooting;                        // Reference to tank's shooting script, used to disable and enable control.
+        private TankHealth m_Health;                            // Reference to tank's health script, used to disable and enable control.
         private GameObject m_CanvasGameObject;                  // Used to disable the world space UI during the Starting and Ending phases of each round.
 
         public delegate void WeaponStockChangedHandler(int playerNumber, int currentStock, string weaponName);
         public event WeaponStockChangedHandler OnWeaponStockChanged;
+
+        public delegate void HealthChangedHandler(int playerNumber, float currentHealth);
+        public event HealthChangedHandler OnHealthChanged;
 
         public float DisableTime = 3.0f;
 
@@ -36,6 +40,7 @@ namespace Complete
             // Get references to the components.
             m_Movement = m_Instance.GetComponent<TankMovement>();
             m_Shooting = m_Instance.GetComponent<TankShooting>();
+            m_Health = m_Instance.GetComponent<TankHealth>();
             m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas>().gameObject;
 
             if (m_Shooting != null)
@@ -43,6 +48,11 @@ namespace Complete
                 m_Shooting.OnShellStockChanged += HandleShellStockChanged;
                 m_Shooting.OnMineStockChanged += HandleMineStockChanged;
                 m_Shooting.OnLayMine += HandleLayMine;
+            }
+
+            if (m_Health != null)
+            {
+                m_Health.OnHealthChange += HandleHealthChanged;
             }
 
             // Set the player numbers to be consistent across the scripts.
@@ -107,6 +117,12 @@ namespace Complete
         private void HandleLayMine()
         {
             ExecuteDelayedAction();
+        }
+
+        private void HandleHealthChanged(float currentHealth)
+        {
+            Debug.Log("HandleHealthChanged: " + currentHealth);
+            OnHealthChanged?.Invoke(m_PlayerNumber, currentHealth);
         }
 
         private async void ExecuteDelayedAction()
