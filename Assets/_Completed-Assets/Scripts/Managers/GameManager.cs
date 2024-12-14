@@ -15,8 +15,6 @@ namespace Complete
         }
 
         private GameState m_CurrentGameState;
-        public delegate void GameStateChangedHandler(GameState newState);
-        public event GameStateChangedHandler OnGameStateChanged;
         public int m_NumRoundsToWin = 5;            // The number of rounds a single player has to win to win the game.
         public float m_StartDelay = 3f;             // The delay between the start of RoundStarting and RoundPlaying phases.
         public float m_EndDelay = 3f;               // The delay between the end of RoundPlaying and RoundEnding phases.
@@ -33,6 +31,11 @@ namespace Complete
         private TankManager m_RoundWinner;          // Reference to the winner of the current round.  Used to make an announcement of who won.
         private TankManager m_GameWinner;           // Reference to the winner of the game.  Used to make an announcement of who won.
 
+        public delegate void GameStateChangedHandler(GameState newState);
+        public event GameStateChangedHandler OnGameStateChanged;
+
+        public delegate void WinCountChangedHandler(int playerNumber, int currentWinCount);
+        public event WinCountChangedHandler OnWinCountChanged;
 
         private void SetGameState(GameState newState)
         {
@@ -162,12 +165,16 @@ namespace Complete
             // See if there is a winner now the round is over.
             m_RoundWinner = GetRoundWinner ();
 
+
             // If there is a winner, increment their score.
             if (m_RoundWinner != null)
                 m_RoundWinner.m_Wins++;
 
             // Now the winner's score has been incremented, see if someone has one the game.
             m_GameWinner = GetGameWinner ();
+
+            // 勝利数変動をHUDに通知
+            OnWinCountChanged?.Invoke(m_RoundWinner.m_PlayerNumber, m_RoundWinner.m_Wins);
 
             // Get a message based on the scores and whether or not there is a game winner and display it.
             string message = EndMessage ();

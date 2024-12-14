@@ -15,6 +15,9 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
         [SerializeField]
         private PlayerHpArea m_Player1HpArea;  // プレイヤー1のHPエリア
 
+        [SerializeField] private PlayerWinArea m_Player1WinArea;  // プレイヤー1の勝利数エリア
+
+
         [SerializeField]
         private GameManager m_GameManager;  // GameManagerへの参照
 
@@ -24,6 +27,7 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             {
                 // GameManagerのイベント購読
                 m_GameManager.OnGameStateChanged += HandleGameStateChanged;
+                m_GameManager.OnWinCountChanged += HandleWinCountChanged;
 
                 // 各タンクのイベント購読
                 foreach (var tank in m_GameManager.m_Tanks)
@@ -40,6 +44,7 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             if (m_GameManager != null)
             {
                 m_GameManager.OnGameStateChanged -= HandleGameStateChanged;
+                m_GameManager.OnWinCountChanged -= HandleWinCountChanged;
 
                 // イベント購読の解除
                 foreach (var tank in m_GameManager.m_Tanks)
@@ -80,7 +85,7 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             // 両プレイヤーのストックエリアの表示/非表示を設定
             if (m_Player1StockArea != null)
                 m_Player1StockArea.gameObject.SetActive(visible);
-            
+
             if (m_Player2StockArea != null)
                 m_Player2StockArea.gameObject.SetActive(visible);
         }
@@ -128,6 +133,19 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             //else if (playerNumber == 2 && m_Player2StockArea != null)
             //{
             //    m_Player2StockArea.UpdateHpArea(currentHealth);
+            //}
+        }
+
+        private void HandleWinCountChanged(int playerNumber, int winCount)
+        {
+            Debug.Log("HandleWinCountChanged: " + playerNumber + ", " + winCount);
+            if (playerNumber == 1 && m_Player1WinArea != null)
+            {
+                m_Player1WinArea.UpdateWinCount(winCount);
+            }
+            //else if (playerNumber == 2 && m_Player2WinArea != null)
+            //{
+            //    //m_Player2StockArea.UpdateWinCount(winCount);
             //}
         }
     }
