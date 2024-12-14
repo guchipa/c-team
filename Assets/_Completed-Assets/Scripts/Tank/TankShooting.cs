@@ -53,11 +53,6 @@ namespace Complete
             // When the tank is turned on, reset the launch force and the UI
             m_CurrentLaunchForce = m_MinLaunchForce;
             m_AimSlider.value = m_MinLaunchForce;
-            m_CurrentAmmoCount = m_InitialAmmoCount;
-            NotifyShellStockChanged();
-
-            MineData.Initialize();
-            NotifyMineStockChanged();
         }
 
 
@@ -72,6 +67,13 @@ namespace Complete
             m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
 
             m_CurrentAmmoCount = Mathf.Min(m_InitialAmmoCount, m_MaxAmmoCount);
+
+
+            m_CurrentAmmoCount = m_InitialAmmoCount;
+            NotifyShellStockChanged();
+
+            MineData.Initialize();
+            NotifyMineStockChanged();
         }
 
 
