@@ -6,20 +6,19 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
     public class HudManager : MonoBehaviour
     {
         // SerializeFieldでInspectorから設定可能に
-        [SerializeField]
-        private PlayerStockArea m_Player1StockArea;  // プレイヤー1のストックエリア
+        [SerializeField] private GameManager m_GameManager;  // GameManagerへの参照
+        
+        [Header("Stock Areas")]
+        [SerializeField] private PlayerStockArea m_Player1StockArea;  // プレイヤー1のストックエリア
+        //[SerializeField] private PlayerStockArea m_Player2StockArea;  // プレイヤー2のストックエリア
 
-        [SerializeField]
-        private PlayerStockArea m_Player2StockArea;  // プレイヤー2のストックエリア
+        [Header("Hp Areas")]
+        [SerializeField] private PlayerHpArea m_Player1HpArea;  // プレイヤー1のHPエリア
+        [SerializeField] private PlayerHpArea m_Player2HpArea;  // プレイヤー2のHPエリア
 
-        [SerializeField]
-        private PlayerHpArea m_Player1HpArea;  // プレイヤー1のHPエリア
-
+        [Header("Win Areas")]
         [SerializeField] private PlayerWinArea m_Player1WinArea;  // プレイヤー1の勝利数エリア
-
-
-        [SerializeField]
-        private GameManager m_GameManager;  // GameManagerへの参照
+        [SerializeField] private PlayerWinArea m_Player2WinArea;  // プレイヤー2の勝利数エリア
 
         private void Start()
         {
@@ -63,10 +62,10 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             {
                 m_Player1StockArea.UpdatePlayerStockArea(currentStock, weaponName);
             }
-            else if (playerNumber == 2 && m_Player2StockArea != null)
-            {
-                m_Player2StockArea.UpdatePlayerStockArea(currentStock, weaponName);
-            }
+            //else if (playerNumber == 2 && m_Player2StockArea != null)
+            //{
+            //    m_Player2StockArea.UpdatePlayerStockArea(currentStock, weaponName);
+            //}
         }
 
         private void HandleGameStateChanged(GameManager.GameState newState)
@@ -86,26 +85,28 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             if (m_Player1StockArea != null)
                 m_Player1StockArea.gameObject.SetActive(visible);
 
-            if (m_Player2StockArea != null)
-                m_Player2StockArea.gameObject.SetActive(visible);
+            //if (m_Player2StockArea != null)
+            //    m_Player2StockArea.gameObject.SetActive(visible);
+
+            // 両プレイヤーのHPエリアの表示/非表示を設定
+            if (m_Player1HpArea != null)
+                m_Player1HpArea.gameObject.SetActive(visible);
+
+            if (m_Player2HpArea != null)
+                m_Player2HpArea.gameObject.SetActive(visible);
+
+            // 両プレイヤーの勝利数エリアの表示/非表示を設定
+            if (m_Player1WinArea != null)
+                m_Player1WinArea.gameObject.SetActive(visible);
+
+            if (m_Player2WinArea != null)
+                m_Player2WinArea.gameObject.SetActive(visible);
         }
 
         private void SetMinimapVisibility(bool isVisible)
         {
             GameObject tank1 = m_GameManager.m_Tanks[0].m_Instance;
-            if (tank1 == null)
-            {
-                Debug.LogError("Tank1 instance is null");
-                return;
-            }
-
             Transform minimapCameraTransform = tank1.transform.Find("TankRenderers/TankTurret/MinimapCamera");
-            if (minimapCameraTransform == null)
-            {
-                Debug.LogError("MinimapCamera not found");
-                return;
-            }
-
             GameObject minimapCamera = minimapCameraTransform.gameObject;
             minimapCamera.SetActive(isVisible);
 
@@ -118,8 +119,6 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             {
                 Debug.LogError("Camera component not found on MinimapCamera");
             }
-
-            Debug.Log("MinimapCamera set to " + isVisible);
         }
 
         private void HandleHealthChanged(int playerNumber, float currentHealth)
@@ -130,10 +129,10 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             {
                 m_Player1HpArea.UpdateHpArea(currentHealth);
             }
-            //else if (playerNumber == 2 && m_Player2StockArea != null)
-            //{
-            //    m_Player2StockArea.UpdateHpArea(currentHealth);
-            //}
+            else if (playerNumber == 2 && m_Player2HpArea != null)
+            {
+                m_Player2HpArea.UpdateHpArea(currentHealth);
+            }
         }
 
         private void HandleWinCountChanged(int playerNumber, int winCount)
@@ -143,10 +142,10 @@ namespace Complete  // HudManagerも同じ名前空間に入れる
             {
                 m_Player1WinArea.UpdateWinCount(winCount);
             }
-            //else if (playerNumber == 2 && m_Player2WinArea != null)
-            //{
-            //    //m_Player2StockArea.UpdateWinCount(winCount);
-            //}
+            else if (playerNumber == 2 && m_Player2WinArea != null)
+            {
+                m_Player2WinArea.UpdateWinCount(winCount);
+            }
         }
     }
 }
