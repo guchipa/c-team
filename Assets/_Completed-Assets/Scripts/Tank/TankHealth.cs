@@ -19,6 +19,9 @@ namespace Complete
         private bool m_Dead;                                // Has the tank been reduced beyond zero health yet?
         private TankController tankController;
 
+        public delegate void OnHealthChangeHandler(float health);
+        public event OnHealthChangeHandler OnHealthChange;
+
         private void Awake ()
         {   tankController = GetComponent<TankController>();
             // Instantiate the explosion prefab and get a reference to the particle system on it.
@@ -55,6 +58,9 @@ namespace Complete
             // Change the UI elements appropriately.
             SetHealthUI ();
 
+            // HP の変動を通知
+            NotifyHealthChanged();
+
             // If the current health is at or below zero and it has not yet been registered, call OnDeath.
             if (m_CurrentHealth <= 0f && !m_Dead)
             {
@@ -62,6 +68,11 @@ namespace Complete
             }
         }
 
+        private void NotifyHealthChanged()
+        {
+            Debug.Log("NotifyHealthChanged: " + m_CurrentHealth);
+            OnHealthChange?.Invoke(m_CurrentHealth);
+        } 
 
         private void SetHealthUI ()
         {
