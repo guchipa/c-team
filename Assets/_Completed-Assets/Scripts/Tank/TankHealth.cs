@@ -43,6 +43,8 @@ namespace Complete
 
             // Update the health slider's value and color.
             SetHealthUI();
+
+            NotifyHealthChanged();
         }
 
 
