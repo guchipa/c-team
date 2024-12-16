@@ -84,7 +84,7 @@ namespace Complete
             if (m_TpsCameraControl != null && m_Tanks.Length > 0)
             {
                 // 最初のタンクの砲塔の Transform を TpsCameraControl に設定
-                m_TpsCameraControl.targetTank = m_Tanks[0].m_Instance.transform.GetChild(0);
+                m_TpsCameraControl.targetTank = m_Tanks[0].m_Instance.transform.Find("TankRenderers/TankTurret");
             }
         }
 
